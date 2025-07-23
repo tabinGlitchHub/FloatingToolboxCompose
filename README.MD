@@ -41,7 +41,7 @@ dependencyResolutionManagement {
 
 ```groovy
 dependencies {
-    implementation 'com.github.tabinGlitchHub:FloatingToolboxCompose:1.0.1'
+    implementation 'com.github.tabinGlitchHub:FloatingToolboxCompose:1.0.3'
 }
 ```
 
@@ -53,7 +53,7 @@ You can check out the latest stable version from the releases section.
 
 ## 🚀 Usage Example
 
-You can always run the application hosted by the repo, but here is a quick example:
+You can always run the application hosted at the demo branch, but here is a quick example:
 
 ```kotlin
 @Composable
