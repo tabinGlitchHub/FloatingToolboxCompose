@@ -48,7 +48,8 @@ android {
 }
 
 dependencies {
-    implementation 'com.github.tabinGlitchHub:FloatingToolboxCompose:1.0.1'//Add this to your project
+    implementation project(':floatingtoolbox')
+//    implementation 'com.github.tabinGlitchHub:FloatingToolboxCompose:1.0.1'//Add this to your project
     implementation libs.material3
     implementation libs.androidx.core.ktx
     implementation libs.androidx.activity.compose
