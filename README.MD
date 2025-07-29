@@ -4,7 +4,6 @@ A customizable Jetpack Compose **video-game-wheel-style popup menu** for Android
 
 Display a circular toolbox with sections that expand around a center button. Each section can show an icon or a curved label, everything is fully customisable!
 
-![FloatingToolbox Demo Image](readmeAssets/FloatingToolBoxDemoSS.png)
 ![FloatingToolbox Demo GIF](readmeAssets/FloatingToolBoxDemoGif.gif)
 
 ---
@@ -41,7 +40,7 @@ dependencyResolutionManagement {
 
 ```groovy
 dependencies {
-    implementation 'com.github.tabinGlitchHub:FloatingToolboxCompose:1.0.3'
+    implementation 'com.github.tabinGlitchHub:FloatingToolboxCompose:1.1.0'
 }
 ```
 

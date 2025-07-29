@@ -68,12 +68,9 @@ fun FloatingToolbox(
     closeSectionIcon: ImageVector = Icons.Outlined.Close,
     closeSectionTint: Color = Color.White,
     centerButtonIcon: ImageVector? = Icons.Outlined.Edit,
+    centerButtonTint: Color = Color.Black,
     sectionIconSize: Dp = 20.dp,
-    sectionLabelAndColorList: List<Pair<Any, Color>> = defaultSections.toMutableList()
-        .apply {
-            //this is the mandatory close button added to user added list of items at 0th position
-            add(0, Pair<Any, Color>(closeSectionIcon, closeSectionColor))
-        },
+    sectionLabelAndColorList: List<Pair<Any, Color>> = defaultSections.toMutableList(),
     onSectionClick: (sectionIndex: Int) -> Unit,
     onCenterClick: () -> Unit,
     animationSpec: AnimationSpec<Float> = spring(
@@ -83,6 +80,11 @@ fun FloatingToolbox(
 ) {
 
     if(!showPopup.value) return
+
+    val sectionLabelAndColorListWithClose = sectionLabelAndColorList.toMutableList().apply {
+        //this is the mandatory close button added to user added list of items at 0th position
+        add(0, Pair<Any, Color>(closeSectionIcon, closeSectionColor))
+    }
 
     Popup(
         // this makes the popup occupy only the size of its content
@@ -94,9 +96,9 @@ fun FloatingToolbox(
         ), onDismissRequest = { showPopup.value = false }) {
         SplitDonutMenu(
             modifier = Modifier.size(donutSize),
-            sectionCount = sectionLabelAndColorList.size,
-            colors = sectionLabelAndColorList,
-            size = donutSize,
+            sectionCount = sectionLabelAndColorListWithClose.size,
+            colors = sectionLabelAndColorListWithClose,
+            donutSize = donutSize,
             thickness = thickness,
             onSectionClick = onSectionClick,
             onCenterClick = onCenterClick,
@@ -105,6 +107,7 @@ fun FloatingToolbox(
             animationSpec = animationSpec,
             slicePopDelay = slicePopDelay,
             centerButtonIcon = centerButtonIcon,
+            centerButtonTint = centerButtonTint,
             closeSectionTint = closeSectionTint,
             iconSize = sectionIconSize
         )
@@ -116,11 +119,12 @@ fun FloatingToolbox(
 private fun SplitDonutMenu(
     modifier: Modifier = Modifier,
     sectionCount: Int = 8,
-    size: Dp = 120.dp,
+    donutSize: Dp = 120.dp,
     thickness: Dp = 35.dp,
     colors: List<Pair<Any, Color>> = defaultSections,
     onSectionClick: (sectionIndex: Int) -> Unit,
     centerButtonIcon: ImageVector?,
+    centerButtonTint: Color,
     closeSectionTint: Color,
     showPopup: MutableState<Boolean>,
     onCenterClick: () -> Unit,
@@ -158,11 +162,11 @@ private fun SplitDonutMenu(
     }
 
     Box(modifier = modifier
-        .size(size)
+        .size(donutSize)
         .clip(CircleShape)
         .pointerInput(sectionCount) {
             detectTapGestures { tapOffset ->
-                val diameter = size.toPx()
+                val diameter = donutSize.toPx()
                 val center = Offset(diameter / 2, diameter / 2)
                 val relative = tapOffset - center
                 val distance = hypot(relative.x, relative.y)
@@ -194,9 +198,9 @@ private fun SplitDonutMenu(
             }
         }) {
 
-        Canvas(modifier = Modifier.size(size)) {
+        Canvas(modifier = Modifier.size(donutSize)) {
             //Shared geometry in px
-            val diameterPx = size.toPx()
+            val diameterPx = donutSize.toPx()
             val radius = diameterPx / 2f
             val strokePx = thickness.toPx()
             val center = Offset(radius, radius)
@@ -328,14 +332,14 @@ private fun SplitDonutMenu(
             // Overlay icon at the center of the donut since it also has a clickable action
             Icon(imageVector = centerButtonIcon,
                 contentDescription = null,
-                tint = Color.Black,
+                tint = centerButtonTint,
                 modifier = Modifier
                     .size(30.dp)
                     .align(Alignment.TopCenter)
                     .offset {
                         IntOffset(
                             x = 0,
-                            y = size.value.toInt() + centerButtonIcon.defaultWidth
+                            y = donutSize.toPx().toInt().div(2) - centerButtonIcon.defaultWidth
                                 .toPx()
                                 .toInt()
                                 .div(2)
