@@ -25,7 +25,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import kotlin.math.PI
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.drawscope.withTransform
@@ -69,6 +72,7 @@ fun FloatingToolbox(
     closeSectionTint: Color = Color.White,
     centerButtonIcon: ImageVector? = Icons.Outlined.Edit,
     centerButtonTint: Color = Color.Black,
+    centerButtonIconStrokeWidth: Dp = 0.dp,
     sectionIconSize: Dp = 20.dp,
     sectionLabelAndColorList: List<Pair<Any, Color>> = defaultSections.toMutableList(),
     onSectionClick: (sectionIndex: Int) -> Unit,
@@ -108,6 +112,7 @@ fun FloatingToolbox(
             slicePopDelay = slicePopDelay,
             centerButtonIcon = centerButtonIcon,
             centerButtonTint = centerButtonTint,
+            centerButtonIconStrokeWidth = centerButtonIconStrokeWidth,
             closeSectionTint = closeSectionTint,
             iconSize = sectionIconSize
         )
@@ -125,6 +130,7 @@ private fun SplitDonutMenu(
     onSectionClick: (sectionIndex: Int) -> Unit,
     centerButtonIcon: ImageVector?,
     centerButtonTint: Color,
+    centerButtonIconStrokeWidth: Dp = 0.dp,
     closeSectionTint: Color,
     showPopup: MutableState<Boolean>,
     onCenterClick: () -> Unit,
@@ -329,23 +335,40 @@ private fun SplitDonutMenu(
 
 
         if (centerButtonIcon != null) {
-            // Overlay icon at the center of the donut since it also has a clickable action
-            Icon(imageVector = centerButtonIcon,
-                contentDescription = null,
-                tint = centerButtonTint,
+            val painter = rememberVectorPainter(centerButtonIcon)
+            val clampedStrokeWidth = centerButtonIconStrokeWidth.coerceAtMost(5.dp)
+            Canvas(
                 modifier = Modifier
-                    .size(30.dp)
+                    .size(30.dp + clampedStrokeWidth * 2)
                     .align(Alignment.TopCenter)
                     .offset {
                         IntOffset(
                             x = 0,
-                            y = donutSize.toPx().toInt().div(2) - centerButtonIcon.defaultWidth
-                                .toPx()
-                                .toInt()
-                                .div(2)
+                            y = donutSize.toPx().toInt().div(2) -
+                                centerButtonIcon.defaultWidth.toPx().toInt().div(2) -
+                                clampedStrokeWidth.toPx().toInt()
                         )
                     }
-                    .alpha(0.4f))
+                    .alpha(0.4f)
+            ) {
+                val strokePx = clampedStrokeWidth.toPx()
+                val iconSizePx = 30.dp.toPx()
+                val iconSize = Size(iconSizePx, iconSizePx)
+                val strokeColorFilter = ColorFilter.tint(Color(0xFFFFFFFF))
+                if (strokePx > 0f) {
+                    for (i in 0 until 16) {
+                        val angle = i * (2.0 * PI / 16.0)
+                        val dx = (cos(angle) * strokePx).toFloat()
+                        val dy = (sin(angle) * strokePx).toFloat()
+                        translate(left = strokePx + dx, top = strokePx + dy) {
+                            with(painter) { draw(size = iconSize, colorFilter = strokeColorFilter) }
+                        }
+                    }
+                }
+                translate(left = strokePx, top = strokePx) {
+                    with(painter) { draw(size = iconSize, colorFilter = ColorFilter.tint(centerButtonTint)) }
+                }
+            }
         }
     }
 }
